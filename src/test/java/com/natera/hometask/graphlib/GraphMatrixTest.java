@@ -5,16 +5,24 @@ import com.natera.hometask.graphlib.matrix.GraphMatrix;
 import com.natera.hometask.graphlib.matrix.NonDirectedGraphMatrix;
 import com.natera.hometask.graphlib.model.Edge;
 import com.natera.hometask.graphlib.model.Vertex;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.spi.LoggerFactoryBinder;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class GraphMatrixTest {
+    private static final Logger logger = LoggerFactory.getLogger(GraphMatrixTest.class);
 
     @Test
     public void fillMatrixTest(){
@@ -48,10 +56,10 @@ public class GraphMatrixTest {
         Vertex vertex3 = new Vertex("Vertex 3");
         Vertex vertex4 = new Vertex("Vertex 4");
 
-        matrix.addVertex(vertex1);
-        matrix.addVertex(vertex2);
-        matrix.addVertex(vertex3);
-        matrix.addVertex(vertex4);
+        matrix.addVertex(vertex1)
+                .addVertex(vertex2)
+                .addVertex(vertex3)
+                .addVertex(vertex4);
 
         matrix.addEdge(vertex2, vertex3);
         matrix.addEdge(vertex1, vertex2);
@@ -127,8 +135,55 @@ public class GraphMatrixTest {
 
         List<Edge> path = matrix.getPath(vertex1, vertex7);
 
-        for(Edge edge: path){
-            System.out.println(edge);
+        Assert.assertEquals(path.size(), 4);
+
+        Edge firstEdge = path.get(0);
+        Assert.assertEquals(firstEdge.getFrom(), vertex1);
+        Assert.assertEquals(firstEdge.getTo(), vertex2);
+
+        Edge lastEdge= path.get(3);
+        Assert.assertEquals(lastEdge.getFrom(), vertex6);
+        Assert.assertEquals(lastEdge.getTo(), vertex7);
+    }
+
+    @Test
+    public void differentTypes(){
+        GraphMatrix matrix = new DirectedGraphMatrix();
+        Vertex vertex1 = new Vertex(new BigInteger("1"));
+        Vertex vertex2 = new Vertex("Vertex 2");
+        Vertex vertex3 = new Vertex("Vertex 3");
+        Vertex vertex4 = new Vertex(new TestClass("Vertex 4"));
+
+        matrix.addVertex(vertex1)
+              .addVertex(vertex2)
+              .addVertex(vertex3)
+              .addVertex(vertex4);
+
+        matrix.addEdge(vertex1, vertex2);
+        matrix.addEdge(vertex1, vertex3);
+        matrix.addEdge(vertex2, vertex4);
+        matrix.addEdge(vertex3, vertex4);
+
+        List<Edge> path = matrix.getPath(vertex1, vertex4);
+
+        Assert.assertEquals(path.size(), 2);
+        Edge first = path.get(0);
+        Edge last = path.get(1);
+        Assert.assertEquals(first.getFrom(), vertex1);
+        Assert.assertEquals(first.getTo(), last.getFrom());
+        Assert.assertEquals(last.getTo().toString(), vertex4.toString());
+    }
+
+    private class TestClass {
+        private String label;
+
+        public TestClass(String label) {
+            this.label = label;
+        }
+
+        @Override
+        public String toString() {
+            return "Test Class : " + label;
         }
     }
 }

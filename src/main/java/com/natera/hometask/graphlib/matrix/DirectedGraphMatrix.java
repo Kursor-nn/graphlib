@@ -11,11 +11,4 @@ public class DirectedGraphMatrix extends GraphMatrix {
         matrix.get(from).add(to);
     }
 
-    private void validateVertexes(Vertex vertex){
-        if(!matrix.containsKey(vertex)){
-            String message = String.format("Vertex '%s' cannot be bind.", vertex);
-            throw new IllegalArgumentException(message);
-        }
-
-    }
 }

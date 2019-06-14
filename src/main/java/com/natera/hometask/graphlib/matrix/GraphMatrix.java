@@ -33,21 +33,15 @@ import java.util.*;
  *
  * Если будут возникать вопросы по тестовому - пожалуйста, задавайте.
  * Дедлайн по выполнению – неделя. Если за неделю по каким-то объективным причинам не получается сделать – дайте мне знать плиз.
- *
- * Параллельно предлагаю сразу назначить техническое интервью. В данный момент из ближайших дат 17,18,21 июня. Желательно в промежутке с 11:00 до 17:00 включительно. Когда вам было бы удобно?
- *
- * Раскрыть сообщение пользователя Anna Sycheva
  */
 
 
 public abstract class GraphMatrix {
     public HashMap<Vertex, List<Vertex>> matrix = new HashMap<>();
 
-    public void addVertex(Vertex vertex){
-        List<Vertex> vertexes = matrix.get(vertex);
-        if(vertexes != null) throw new IllegalArgumentException();
-
-        matrix.put(vertex, new LinkedList<>());
+    public Shield addVertex(Vertex vertex){
+        Shield shield = new Shield();
+        return shield.addVertex(vertex);
     }
 
     public abstract void addEdge(Vertex from, Vertex to);
@@ -90,5 +84,19 @@ public abstract class GraphMatrix {
         } while(queue.size() != 0);
 
         return road;
+    }
+
+    public class Shield {
+        public Shield addVertex(Vertex vertex){
+            matrix.putIfAbsent(vertex, new ArrayList<>());
+            return this;
+        }
+    }
+
+    protected void validateVertexes(Vertex vertex){
+        if(!matrix.containsKey(vertex)){
+            String message = String.format("Vertex '%s' cannot be bind.", vertex);
+            throw new IllegalArgumentException(message);
+        }
     }
 }
